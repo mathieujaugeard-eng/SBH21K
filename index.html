@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SBH 21K — Préparation</title>
+<style>
+:root{--t:#0d9488;--td:#0f766e;--c:#f97316;--bg:#f0fdfa;--wh:#fff;--tx:#1e293b;--mu:#64748b;--bd:#e2e8f0;--gr:#22c55e;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;max-width:480px;margin:0 auto;}
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--t) 0%,#0e7490 100%);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:50;}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.hdr h1{font-size:17px;font-weight:800;letter-spacing:-.3px;}
+.pill{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;}
+.prg-lbl{display:flex;justify-content:space-between;font-size:11px;opacity:.85;margin-bottom:5px;}
+.prg-bar{height:5px;background:rgba(255,255,255,.25);border-radius:3px;}
+.prg-fill{height:100%;background:#fbbf24;border-radius:3px;transition:width .5s;}
+/* NAV */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--bd);display:flex;z-index:50;box-shadow:0 -2px 10px rgba(0,0,0,.08);}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 6px;cursor:pointer;border:none;background:none;color:var(--mu);font-family:inherit;transition:color .15s;}
+.ni.on{color:var(--t);}
+.ni span:first-child{font-size:20px;}
+.ni span:last-child{font-size:10px;font-weight:600;margin-top:1px;}
+/* PAGES */
+.pg{display:none;padding:14px 14px 80px;}
+.pg.on{display:block;}
+/* SHARED */
+.ttl{font-size:17px;font-weight:800;margin-bottom:12px;}
+.card{background:#fff;border-radius:16px;padding:14px;margin-bottom:10px;border:1px solid var(--bd);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.card-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:8px;}
+/* TODAY CARD */
+.tw{border-radius:20px;padding:20px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden;}
+.tw.run{background:linear-gradient(135deg,var(--t) 0%,#0e7490 100%);}
+.tw.rest{background:linear-gradient(135deg,#94a3b8 0%,#64748b 100%);}
+.tw.tennis{background:linear-gradient(135deg,var(--c) 0%,#ea580c 100%);}
+.tw.race{background:linear-gradient(135deg,#f59e0b 0%,var(--c) 100%);}
+.tw::after{content:'';position:absolute;right:-15px;top:-15px;width:100px;height:100px;background:rgba(255,255,255,.1);border-radius:50%;}
+.wkbdg{background:rgba(255,255,255,.2);border-radius:8px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:6px;}
+.tw-ttl{font-size:22px;font-weight:800;margin-bottom:2px;}
+.tw-sub{opacity:.85;font-size:13px;margin-bottom:14px;}
+.meta-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.mc{background:rgba(255,255,255,.18);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;}
+.stps{background:rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;margin-bottom:12px;}
+.stp{display:flex;align-items:flex-start;gap:7px;padding:4px 0;font-size:13px;line-height:1.4;}
+.sdot{width:5px;height:5px;background:rgba(255,255,255,.6);border-radius:50%;flex-shrink:0;margin-top:6px;}
+.tipbox{background:rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;font-size:13px;opacity:.92;margin-bottom:14px;line-height:1.4;}
+.tipbox strong{display:block;margin-bottom:3px;font-size:12px;opacity:.8;text-transform:uppercase;letter-spacing:.5px;}
+.btn-done{width:100%;padding:13px;border:none;border-radius:12px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-done.idle{background:#fff;color:var(--t);}
+.btn-done.done{background:#22c55e;color:#fff;}
+.btn-done.race{background:#fff;color:#f59e0b;font-size:14px;}
+.btn-done:active{transform:scale(.97);}
+/* WEEK STRIP */
+.wstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.wsd{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.wsl{font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;}
+.wsdot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid transparent;}
+.wsn{font-size:9px;color:var(--mu);}
+.wsdot.run{background:#ccfbf1;color:var(--t);}
+.wsdot.run.done{background:var(--t);color:#fff;}
+.wsdot.tennis{background:#ffedd5;color:var(--c);}
+.wsdot.rest{background:#f1f5f9;color:#94a3b8;}
+.wsdot.race{background:#fef3c7;color:#d97706;}
+.wsdot.today-d{border-color:var(--t);}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat{background:#fff;border-radius:14px;padding:12px 8px;text-align:center;border:1px solid var(--bd);}
+.sv{font-size:22px;font-weight:800;color:var(--t);}
+.sl{font-size:11px;color:var(--mu);font-weight:500;margin-top:2px;}
+/* PROGRAMME */
+.wblk{background:#fff;border-radius:16px;margin-bottom:10px;overflow:hidden;border:1px solid var(--bd);}
+.whdr{display:flex;align-items:center;gap:10px;padding:14px;cursor:pointer;user-select:none;}
+.wnum{width:36px;height:36px;border-radius:10px;background:var(--t);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;}
+.wnum.past{background:#94a3b8;}
+.wnum.cur{background:var(--c);}
+.wnum.fut{background:var(--bd);color:var(--mu);}
+.wmeta{flex:1;}
+.wtheme{font-weight:700;font-size:14px;}
+.wdesc{font-size:12px;color:var(--mu);}
+.wchev{color:var(--mu);font-size:12px;transition:transform .25s;}
+.wchev.open{transform:rotate(180deg);}
+.wbody{padding:0 14px 14px;border-top:1px solid var(--bd);}
+.drow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f8fafc;}
+.drow:last-child{border-bottom:none;}
+.drow.today-r{background:#f0fdfa;border-radius:8px;padding:10px 8px;}
+.ddt{width:32px;text-align:center;flex-shrink:0;}
+.ddtn{font-size:17px;font-weight:700;line-height:1;}
+.ddtm{font-size:10px;color:var(--mu);text-transform:uppercase;}
+.dico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.ico-run{background:#ccfbf1;}
+.ico-race{background:#fef3c7;}
+.dinfo{flex:1;}
+.dttl{font-size:14px;font-weight:600;}
+.ddsc{font-size:12px;color:var(--mu);}
+.dright{display:flex;align-items:center;gap:6px;}
+.ddur{font-size:12px;font-weight:600;color:var(--t);}
+.chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;font-size:11px;}
+.chk.on{background:var(--gr);border-color:var(--gr);color:#fff;}
+/* TIPS */
+.tpills{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;}
+.tpills::-webkit-scrollbar{display:none;}
+.tp{padding:5px 13px;border-radius:20px;border:2px solid var(--bd);background:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--mu);font-family:inherit;transition:all .2s;}
+.tp.on{background:var(--t);border-color:var(--t);color:#fff;}
+.tips{display:none;}
+.tips.on{display:block;}
+.titem{display:flex;gap:12px;padding:12px 14px;background:#fff;border-radius:14px;margin-bottom:8px;border-left:4px solid var(--t);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.tem{font-size:22px;flex-shrink:0;}
+.tttl{font-size:14px;font-weight:700;margin-bottom:3px;}
+.ttxt{font-size:13px;color:var(--mu);line-height:1.45;}
+/* NUTRITION */
+.atag{display:inline-block;background:#fee2e2;color:#dc2626;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;margin:2px;}
+.mcard{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--bd);}
+.mttl{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.mitems{list-style:none;}
+.mitems li{padding:5px 0;font-size:13px;color:var(--mu);display:flex;align-items:flex-start;gap:7px;border-bottom:1px solid #f8fafc;line-height:1.4;}
+.mitems li:last-child{border-bottom:none;}
+.mitems li::before{content:'•';color:var(--t);font-weight:700;flex-shrink:0;}
+/* COURSE */
+.rhero{background:linear-gradient(135deg,#f59e0b 0%,var(--c) 100%);color:#fff;border-radius:20px;padding:22px;margin-bottom:14px;text-align:center;}
+.rhero .big{font-size:44px;margin-bottom:6px;}
+.rhero h2{font-size:22px;font-weight:800;margin-bottom:4px;}
+.rhero p{opacity:.9;font-size:14px;}
+.irow{display:flex;gap:8px;margin-bottom:12px;}
+.ic{flex:1;background:#fff;border-radius:12px;padding:12px 8px;text-align:center;border:1px solid var(--bd);}
+.ic .iv{font-size:15px;font-weight:800;color:var(--t);}
+.ic .il{font-size:11px;color:var(--mu);}
+.tl-item{display:flex;gap:12px;margin-bottom:2px;}
+.tl-left{display:flex;flex-direction:column;align-items:center;}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:var(--t);flex-shrink:0;margin-top:3px;}
+.tl-line{flex:1;width:2px;background:var(--bd);margin:3px 0;min-height:18px;}
+.tl-content{flex:1;padding-bottom:12px;}
+.tl-time{font-size:11px;font-weight:700;color:var(--t);margin-bottom:1px;}
+.tl-text{font-size:14px;font-weight:600;margin-bottom:2px;}
+.tl-hint{font-size:12px;color:var(--mu);}
+.alert{border-radius:12px;padding:11px 13px;margin-bottom:10px;display:flex;gap:9px;font-size:13px;line-height:1.45;}
+.aw{background:#fffbeb;border:1px solid #fcd34d;color:#92400e;}
+.ai{background:#f0fdfa;border:1px solid #99f6e4;color:#134e4a;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:#f8fafc;padding:8px 10px;text-align:left;font-weight:700;color:var(--mu);font-size:11px;text-transform:uppercase;}
+td{padding:8px 10px;border-bottom:1px solid var(--bd);}
+tr:last-child td{border-bottom:none;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <h1>🏃 SBH 21K</h1>
+    <span class="pill" id="countdown">J-?</span>
+  </div>
+  <div class="prg-lbl"><span id="prg-label">Progression</span><span id="prg-pct">0%</span></div>
+  <div class="prg-bar"><div class="prg-fill" id="prg-fill" style="width:0%"></div></div>
+</div>
+
+<div id="pg-today" class="pg on"></div>
+<div id="pg-prog" class="pg"></div>
+<div id="pg-tips" class="pg">
+  <div class="ttl">Conseils</div>
+  <div class="tpills">
+    <button class="tp on" onclick="showTip('chaleur')">🌡️ Chaleur</button>
+    <button class="tp" onclick="showTip('denivele')">⛰️ Dénivelé</button>
+    <button class="tp" onclick="showTip('recup')">💤 Récupération</button>
+    <button class="tp" onclick="showTip('equip')">👟 Équipement</button>
+  </div>
+  <div id="tip-chaleur" class="tips on">
+    <div class="alert ai">☀️ <div>St Barth : 28-32°C en mai, humidité 75-85%. La chaleur coûte 10-15% de ta vitesse. C'est normal de ralentir.</div></div>
+    <div class="titem"><div class="tem">⏰</div><div><div class="tttl">Cours le matin avant 8h</div><div class="ttxt">La température est 5-8°C plus basse qu'à midi. Priorité absolue pour tes longues sorties. Réveil 5h30 idéal.</div></div></div>
+    <div class="titem"><div class="tem">💧</div><div><div class="tttl">Protocole hydratation chaleur</div><div class="ttxt">500ml d'eau 1h avant. 150-200ml toutes les 20min pendant l'effort. Eau + sel (pincée de sel dans la gourde) pour remplacer les électrolytes perdus en sueur.</div></div></div>
+    <div class="titem"><div class="tem">🌊</div><div><div class="tttl">Acclimatation obligatoire (Semaine 5)</div><div class="ttxt">Fais une sortie intentionnellement à 17h30 en chaleur. Ton corps va s'adapter en 7-10 jours. Volume plasmatique +10%, meilleure sudation.</div></div></div>
+    <div class="titem"><div class="tem">🧊</div><div><div class="tttl">Pré-refroidissement avant la course</div><div class="ttxt">Le matin du 10 mai : boire eau fraîche, appliquer glace sur nuque et poignets 10min avant le départ. Peut améliorer la perf de 5-10%.</div></div></div>
+    <div class="titem"><div class="tem">🩺</div><div><div class="tttl">Signes d'alerte à connaître</div><div class="ttxt">Nausées, maux de tête, arrêt de la transpiration = coup de chaleur. Arrête immédiatement, mets-toi à l'ombre, hydrate-toi. Ne force jamais en cas de malaise.</div></div></div>
+  </div>
+  <div id="tip-denivele" class="tips">
+    <div class="alert ai">⛰️ <div>Le SBH 21K cumule environ 700-900m de dénivelé positif. C'est BEAUCOUP pour un semi. La marche en montée est une stratégie, pas un abandon.</div></div>
+    <div class="titem"><div class="tem">📐</div><div><div class="tttl">Technique montée</div><div class="ttxt">Courte le torse vers l'avant, raccourcis le pas, pompe les bras. Effort constant > vitesse constante. Il est normal de ralentir à 5-6min/km en montée.</div></div></div>
+    <div class="titem"><div class="tem">🚶</div><div><div class="tttl">Stratégie marche en montée</div><div class="ttxt">Marcher dans les montées de +10% de pente te FAIT GAGNER du temps sur le total. Ça préserve tes quadriceps pour les descentes et le finish. C'est la stratégie des pros sur ce type de course.</div></div></div>
+    <div class="titem"><div class="tem">⬇️</div><div><div class="tttl">Technique descente</div><div class="ttxt">Petits pas rapides, genoux légèrement fléchis, appui sur l'avant du pied. Ne "freine" pas avec tes jambes — ça détruit les quadriceps. Laisse la gravité travailler.</div></div></div>
+    <div class="titem"><div class="tem">💪</div><div><div class="tttl">Gainage et fessiers</div><div class="ttxt">3×/semaine : pompes, squats, fentes, planche 30sec. Des jambes et un core forts absorbent mieux le choc en descente et stabilisent en montée.</div></div></div>
+    <div class="titem"><div class="tem">🗺️</div><div><div class="tttl">Reconnaître le parcours</div><div class="ttxt">Les grosses montées sont vers km 5-8 et km 14-17 (approximatif). Démarre très lentement sur le plat de départ pour avoir des réserves pour les ascensions.</div></div></div>
+  </div>
+  <div id="tip-recup" class="tips">
+    <div class="titem"><div class="tem">😴</div><div><div class="tttl">Le sommeil est ton meilleur entraînement</div><div class="ttxt">8h de sommeil = +20% de performance. Le corps se répare la nuit. Couche-toi avant 22h les soirs de semaine. Pas d'écran 30min avant.</div></div></div>
+    <div class="titem"><div class="tem">🍗</div><div><div class="tttl">Fenêtre de récupération 30min</div><div class="ttxt">Dans les 30min post-course : 20-30g de protéines + glucides. Pour toi (sans poisson/oeufs) : blanc de poulet + riz, ou shake protéiné végétal + banane.</div></div></div>
+    <div class="titem"><div class="tem">🛁</div><div><div class="tttl">Bain froid ou eau de mer</div><div class="ttxt">5-10min dans eau froide après une longue sortie = réduction inflammation de 30%. Tu es sur une île — l'océan est ton meilleur outil de récupération !</div></div></div>
+    <div class="titem"><div class="tem">🎾</div><div><div class="tttl">Tennis = cross-training parfait</div><div class="ttxt">Cardio, coordination, réflexes. Considère tes sessions tennis comme de l'entraînement croisé. Le lendemain d'une longue sortie, joue à intensité modérée.</div></div></div>
+    <div class="titem"><div class="tem">🦵</div><div><div class="tttl">Étirements post-effort</div><div class="ttxt">Ischios, mollets, quadriceps, fléchisseurs de hanche : 30sec chaque côté, jamais en douleur. Idéalement dans les 20min suivant l'effort.</div></div></div>
+  </div>
+  <div id="tip-equip" class="tips">
+    <div class="alert aw">⚠️ <div>Ne mets JAMAIS un nouvel équipement le jour de la course. Teste tout en entraînement d'abord.</div></div>
+    <div class="titem"><div class="tem">👟</div><div><div class="tttl">Chaussures de trail ou route ?</div><div class="ttxt">Le SBH 21K alterne route et chemins. Trail légères avec bonne accroche recommandées. Si tu n'as que des running route, ça passe. Évite les chaussures neuves — minimum 50km de rodage.</div></div></div>
+    <div class="titem"><div class="tem">💧</div><div><div class="tttl">Ceinture d'hydratation indispensable</div><div class="ttxt">Les ravitaillements sont espacés en course. Ceinture avec 2 flasks (500ml total minimum) = sécurité. Teste-la à l'entraînement pour éviter les frottements.</div></div></div>
+    <div class="titem"><div class="tem">🧴</div><div><div class="tttl">Anti-frottements</div><div class="ttxt">Vaseline ou crème anti-frottement sur l'intérieur des cuisses, aisselles, mamelons (pour homme). En 21km par chaleur, ça peut être douloureux sans protection.</div></div></div>
+    <div class="titem"><div class="tem">🕶️</div><div><div class="tttl">Soleil + casquette</div><div class="ttxt">Casquette légère avec visière = protection solaire et psych. Crème solaire sur les bras/épaules/nuque. Lunettes légères optionnelles.</div></div></div>
+    <div class="titem"><div class="tem">⌚</div><div><div class="tttl">Montre GPS recommandée</div><div class="ttxt">Pour gérer ton allure et éviter de partir trop vite. Règle une alerte si tu dépasses 7min/km au départ. Si pas de montre, cours à l'effort perçu (5-6/10 max les 5 premiers km).</div></div></div>
+  </div>
+</div>
+
+<div id="pg-nutri" class="pg">
+  <div class="ttl">Nutrition</div>
+  <div class="card">
+    <div class="card-lbl">Tes allergies — plan adapté</div>
+    <div style="margin-bottom:8px;"><span class="atag">🐟 Poisson</span><span class="atag">🥚 Oeufs</span><span class="atag">🥜 Fruits à coque</span></div>
+    <p style="font-size:13px;color:var(--mu);line-height:1.45;">Toutes les recommandations ci-dessous évitent ces aliments. Tu peux quand même performer à 100% avec une alimentation adaptée.</p>
+  </div>
+  <div class="mcard"><div class="mttl">🌅 Avant la course (2-3h avant)</div><ul class="mitems"><li>Riz blanc ou pâtes + sauce tomate (glucides digestes)</li><li>Blanc de poulet grillé (protéines légères)</li><li>Banane ou compote de pomme</li><li>Pain blanc avec confiture ou miel</li><li>Évite : fibres, graisses, aliments inhabituels</li></ul></div>
+  <div class="mcard"><div class="mttl">⚡ Pendant les longues sorties (+60min)</div><ul class="mitems"><li>Gels énergétiques toutes les 30-35min (lis les étiquettes : sans traces de fruits à coque)</li><li>Dattes fraîches (glucides naturels, très bien tolérées)</li><li>Banane en morceaux dans une poche</li><li>Eau avec pincée de sel + citron (électrolytes)</li><li>Teste TOUJOURS tes gels à l'entraînement avant la course</li></ul></div>
+  <div class="mcard"><div class="mttl">🔄 Récupération post-effort</div><ul class="mitems"><li>Dans les 30min : shake protéiné végétal (pois, chanvre) + banane</li><li>Repas complet : poulet/boeuf + riz ou patate douce + légumes cuits</li><li>Lentilles corail ou pois chiches (protéines + glucides)</li><li>Tofu si tu l'acceptes bien (protéines complètes)</li><li>Viande rouge 1-2×/sem pour le fer (important pour l'endurance)</li></ul></div>
+  <div class="mcard"><div class="mttl">💧 Hydratation quotidienne</div><ul class="mitems"><li>2,5-3L d'eau par jour minimum (chaleur tropicale)</li><li>Eau de coco : excellent pour les électrolytes naturels</li><li>Évite l'alcool les 2 jours avant une sortie longue</li><li>Urine jaune pâle = bonne hydratation. Foncée = bois plus</li><li>Sel sur les repas OK (perte importante en sueur)</li></ul></div>
+  <div class="mcard"><div class="mttl">📅 Semaine avant la course</div><ul class="mitems"><li>+20% de glucides complexes (riz, pâtes, pain)</li><li>Repas familiers, rien de nouveau</li><li>Dernier grand repas : vendredi 9 mai soir</li><li>Samedi 9 : repas léger, beaucoup d'eau</li><li>Dimanche matin : petit-déj simple 2-3h avant départ</li></ul></div>
+</div>
+
+<div id="pg-race" class="pg">
+  <div class="rhero"><div class="big">🏁</div><h2>SBH 21K — 10 Mai 2026</h2><p>Les 21 kilomètres de Saint-Barthélemy</p></div>
+  <div class="irow">
+    <div class="ic"><div class="iv">21.1km</div><div class="il">Distance</div></div>
+    <div class="ic"><div class="iv">~800m</div><div class="il">Dénivelé +</div></div>
+    <div class="ic"><div class="iv">8-9'/km</div><div class="il">Allure cible</div></div>
+  </div>
+  <div class="irow">
+    <div class="ic"><div class="iv">~2h50</div><div class="il">Objectif finish</div></div>
+    <div class="ic"><div class="iv">Parking<br>Collectivité</div><div class="il">Départ</div></div>
+    <div class="ic"><div class="iv">Parvis<br>Wall House</div><div class="il">Arrivée</div></div>
+  </div>
+  <div class="card"><div class="card-lbl">🌅 Matin course — Planning</div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-time">6H00</div><div class="tl-text">Réveil + Petit-déjeuner</div><div class="tl-hint">Riz ou pâtes + poulet. Café si habituel. 500ml eau.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-time">7H15</div><div class="tl-text">Pré-refroidissement</div><div class="tl-hint">Eau fraîche, glace sur nuque/poignets, crème solaire.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-time">7H30</div><div class="tl-text">Départ vers Parking Collectivité</div><div class="tl-hint">15min avant = check dossard, toilettes, échauffement léger.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-time">~8H00</div><div class="tl-text">🏁 Départ course</div><div class="tl-hint">Commence en QUEUE de peloton. Démarre très lentement.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-time">KM 5</div><div class="tl-text">Premier gel + eau</div><div class="tl-hint">Profite si tu es encore frais. Les montées arrivent.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-time">KM 10</div><div class="tl-text">Ravitaillement + bilan</div><div class="tl-hint">Deuxième gel. Arrose tête + nuque à chaque station.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div></div><div class="tl-content"><div class="tl-time">~10H50</div><div class="tl-text">🎉 Parvis du Wall House !</div><div class="tl-hint">Tu l'as fait. 9 semaines de préparation récompensées.</div></div></div>
+  </div>
+  <div class="card"><div class="card-lbl">🎯 Stratégie de course</div>
+    <table><thead><tr><th>Km</th><th>Allure cible</th><th>Consigne</th></tr></thead><tbody>
+      <tr><td>0–5</td><td>9 min/km</td><td>Très lent, chaleur, économise</td></tr>
+      <tr><td>5–10</td><td>8–9 min/km</td><td>Marche toutes montées &gt;10%</td></tr>
+      <tr><td>10–15</td><td>8–9 min/km</td><td>Maintien, gel km 12, eau +++</td></tr>
+      <tr><td>15–18</td><td>Variable</td><td>Dernier gros D+, marche si besoin</td></tr>
+      <tr><td>18–21</td><td>8 min/km</td><td>Tout donner, c'est fini après !</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><div class="card-lbl">🎒 Checklist équipement</div>
+    <ul class="mitems" style="list-style:none;padding:0;">
+      <li id="c1" onclick="toggleCheck('c1')" style="cursor:pointer;">Dossard fixé (4 épingles)</li>
+      <li id="c2" onclick="toggleCheck('c2')" style="cursor:pointer;">Chaussures rodées (50km+)</li>
+      <li id="c3" onclick="toggleCheck('c3')" style="cursor:pointer;">Ceinture hydratation + 2 flasks</li>
+      <li id="c4" onclick="toggleCheck('c4')" style="cursor:pointer;">3-4 gels testés à l'entraînement</li>
+      <li id="c5" onclick="toggleCheck('c5')" style="cursor:pointer;">Anti-frottements (Vaseline)</li>
+      <li id="c6" onclick="toggleCheck('c6')" style="cursor:pointer;">Casquette + lunettes + crème solaire</li>
+      <li id="c7" onclick="toggleCheck('c7')" style="cursor:pointer;">Montre GPS chargée</li>
+      <li id="c8" onclick="toggleCheck('c8')" style="cursor:pointer;">Téléphone chargé (sécurité)</li>
+    </ul>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="ni on" onclick="showPage('today','btn-today')" id="btn-today"><span>🏠</span><span>Aujourd'hui</span></button>
+  <button class="ni" onclick="showPage('prog','btn-prog')" id="btn-prog"><span>📅</span><span>Programme</span></button>
+  <button class="ni" onclick="showPage('tips','btn-tips')" id="btn-tips"><span>💡</span><span>Conseils</span></button>
+  <button class="ni" onclick="showPage('nutri','btn-nutri')" id="btn-nutri"><span>🥗</span><span>Nutrition</span></button>
+  <button class="ni" onclick="showPage('race','btn-race')" id="btn-race"><span>🏁</span><span>Course</span></button>
+</nav>
+
+<script>
+const RACE_DATE = new Date('2026-05-10');
+const plan = [
+  {wk:1,theme:'Mise en jambes',desc:'Premières foulées — le corps s\'adapte',days:[
+    {d:'2026-03-11',t:'run',label:'Première foulée',dur:'25 min',km:2.5,int:1,steps:['5min marche échauffement','12× (30s course + 1min marche)','5min marche retour au calme'],tip:'🐢 Cours très doucement — tu dois pouvoir parler normalement. Bois 500ml avant de partir.'},
+    {d:'2026-03-13',t:'run',label:'Run & Marche',dur:'30 min',km:3,int:1,steps:['5min marche','10× (1min course + 1min marche)','5min marche'],tip:'Même allure tranquille. Épaules relâchées, respiration par le nez.'},
+    {d:'2026-03-14',t:'run',label:'Longue sortie #1',dur:'45 min',km:4.5,int:1,steps:['5min marche','12× (2min course + 1min marche)','5min cool-down'],tip:'🌅 Première longue sortie ! Emporte de l\'eau. Sors avant 7h45 pour éviter la chaleur.'},
+  ]},
+  {wk:2,theme:'Construction',desc:'Les blocs s\'allongent progressivement',days:[
+    {d:'2026-03-18',t:'run',label:'Blocs de 2 min',dur:'30 min',km:3.5,int:1,steps:['5min marche','8× (2min course + 1min marche)','5min marche'],tip:'Effort 5/10. Confort avant tout — tu dois finir en ayant l\'impression de pouvoir continuer.'},
+    {d:'2026-03-20',t:'run',label:'Collines + Blocs',dur:'35 min',km:4,int:2,steps:['5min marche','7× (3min course + 1min marche)','2× montée de colline douce'],tip:'⛰️ Première expo aux collines. Ralentis en montée — garde l\'effort constant, pas la vitesse.'},
+    {d:'2026-03-21',t:'run',label:'Longue sortie #2',dur:'50 min',km:5.5,int:1,steps:['5min marche','10× (4min course + 1min marche)','5min marche'],tip:'~5.5km. Allure conversation. Tu progresses déjà vite !'},
+  ]},
+  {wk:3,theme:'Endurance',desc:'Premiers runs continus, 6-7km',days:[
+    {d:'2026-03-24',t:'run',label:'Course continue',dur:'30 min',km:4,int:1,steps:['5min marche','20min course continue (ou 5×4min/1min si besoin)','5min marche'],tip:'Essaie 20min sans t\'arrêter. Si difficile, reviens au run/walk. Pas de honte.'},
+    {d:'2026-03-27',t:'run',label:'3× Collines',dur:'40 min',km:5,int:2,steps:['5min marche','15min facile','3× montée 2min + récup descente marche','10min retour'],tip:'⛰️ Penche le buste vers l\'avant en montée. Petits pas. Effort à 7/10.'},
+    {d:'2026-03-28',t:'run',label:'Longue sortie #3',dur:'65 min',km:7,int:1,steps:['5min marche','55min course/marche selon besoin','5min cool-down'],tip:'7km ! Ravitaille toutes les 20min. Tu feras la moitié du semi dans quelques semaines.'},
+  ]},
+  {wk:4,theme:'Dénivelé',desc:'L\'île est vallonnée — prépare les jambes',days:[
+    {d:'2026-04-01',t:'run',label:'Easy + Collines courtes',dur:'35 min',km:4.5,int:2,steps:['5min marche','20min facile','4× sprint colline 45sec + récup descente','5min marche'],tip:'Le SBH 21K cumule ~800m D+. Tes quadriceps doivent s\'y habituer.'},
+    {d:'2026-04-03',t:'run',label:'Hill Repeats',dur:'40 min',km:5,int:3,steps:['5min marche','10min facile','4× montée 3min effort (récup descente jogging)','5min cool-down'],tip:'🔥 Séance clé ! Effort 8/10 en montée. Bois bien avant ET après.'},
+    {d:'2026-04-04',t:'run',label:'Longue vallonnée #4',dur:'70 min',km:8,int:2,steps:['5min marche','60min sur parcours vallonné','5min cool-down'],tip:'Cherche un parcours avec D+. Lent c\'est normal et voulu. ~8km.'},
+  ]},
+  {wk:5,theme:'Acclimatation Chaleur',desc:'Entraîne-toi dans les conditions réelles',days:[
+    {d:'2026-04-07',t:'run',label:'Intervals allure race',dur:'35 min',km:5,int:2,steps:['5min marche','10min facile','5× 4min allure course / 1min marche','5min cool-down'],tip:'Apprends à gérer l\'effort en chaleur tropicale. Ralentis si tu souffres.'},
+    {d:'2026-04-10',t:'run',label:'Run en chaleur 🌡️',dur:'40 min',km:5,int:1,steps:['5min marche','30min facile','5min cool-down'],tip:'🌡️ Sors à 17h30 intentionnellement. Acclimatation à la chaleur maximale. Ceinture hydratation.'},
+    {d:'2026-04-11',t:'run',label:'Longue sortie #5',dur:'75 min',km:9,int:1,steps:['5min marche','65min course/marche','5min cool-down'],tip:'9km — tu es à mi-chemin du semi ! Teste ton équipement de course.'},
+  ]},
+  {wk:6,theme:'Simulation',desc:'Conditions proches du Jour J',days:[
+    {d:'2026-04-14',t:'run',label:'Allure cible',dur:'40 min',km:5.5,int:2,steps:['5min marche','30min à allure semi-marathon cible (~8-9min/km)','5min cool-down'],tip:'Ton allure du 10 mai : 8-9min/km. Grave cette sensation dans ta mémoire musculaire.'},
+    {d:'2026-04-17',t:'run',label:'Technique montée/descente',dur:'45 min',km:6,int:2,steps:['5min marche','15min facile','4× montée 3min + descente technique active','10min retour'],tip:'En descente : petits pas rapides, ne freine pas avec les jambes. Technique = énergie économisée.'},
+    {d:'2026-04-18',t:'run',label:'Simulation 12-14km 🚀',dur:'90 min',km:13,int:2,steps:['5min marche','80-85min avec D+ et conditions chaudes','5min cool-down'],tip:'🚀 Ton plus long run ! Ravitaillement toutes les 30min. Tu peux finir le 21km.'},
+  ]},
+  {wk:7,theme:'Affinement',desc:'Intensité + dernière longue sortie',days:[
+    {d:'2026-04-21',t:'run',label:'Intervals vifs',dur:'35 min',km:5,int:3,steps:['5min marche','10min facile','6× 3min vif / 2min récup','5min cool-down'],tip:'Effort 8/10 sur les blocs. Respiration contrôlée. Ne bloque pas.'},
+    {d:'2026-04-23',t:'run',label:'Récupération active',dur:'30 min',km:3.5,int:1,steps:['25min très facile','5min marche','Étirements doux 10min'],tip:'Jambes légères. Allure "promenade rapide". C\'est une séance de récup, pas de perf.'},
+    {d:'2026-04-25',t:'run',label:'Dernière longue sortie',dur:'80 min',km:10.5,int:1,steps:['5min marche','70min avec D+ modéré','5min cool-down'],tip:'Après ça, on réduit ! Tu as fait le plus dur. 10.5km. Bravo.'},
+  ]},
+  {wk:8,theme:'Réduction',desc:'Volume réduit, qualité maintenue',days:[
+    {d:'2026-04-28',t:'run',label:'Sortie légère',dur:'30 min',km:3.5,int:1,steps:['5min marche','20min très facile','5min marche'],tip:'Le repos FAIT PARTIE de l\'entraînement. Ne rajoute pas de volume.'},
+    {d:'2026-04-30',t:'run',label:'Rappel allure',dur:'25 min',km:3,int:2,steps:['5min marche','5min facile','3× 4min allure course + 2min récup','5min cool-down'],tip:'Rappelle-toi ton rythme cible. Confiance. Tu es prêt(e).'},
+    {d:'2026-05-02',t:'run',label:'Run confiance',dur:'50 min',km:6,int:1,steps:['5min marche','40min facile','5min marche'],tip:'Dernier run de volume. Mets ton équipement exact de course. Vérifie que tout va.'},
+  ]},
+  {wk:9,theme:'Taper — Semaine Course',desc:'Repos, activation, visualisation',days:[
+    {d:'2026-05-04',t:'run',label:'Activation',dur:'20 min',km:2.5,int:1,steps:['20min très facile','Étirements doux'],tip:'Très lent. Juste bouger les jambes. Hydratation intensive cette semaine.'},
+    {d:'2026-05-06',t:'run',label:'Mini-test allure',dur:'20 min',km:2.5,int:1,steps:['5min marche','3× 2min allure course','5min marche'],tip:'Rappelle ton rythme. Aucun effort soutenu !'},
+    {d:'2026-05-08',t:'run',label:'Shake-out run',dur:'15 min',km:2,int:1,steps:['15min très facile','4× 20sec allure course sur plat'],tip:'Dernier run avant la course ! Prépare ton sac ce soir. Tu es prêt(e).'},
+    {d:'2026-05-10',t:'race',label:'🏁 SBH 21K — JOUR J !',dur:'~2h50',km:21.1,int:3,steps:['6h00 Réveil + petit-déjeuner (poulet + riz)','7h15 Pré-refroidissement (eau fraîche, glace nuque)','7h30 Direction Parking Collectivité','~8h00 DÉPART — très lentement !','Marche dans toutes les grosses montées','Profite — tu l\'as mérité ! 🎉'],tip:'🏅 Démarre TRÈS lentement. Marche stratégiquement en montée. Arrose-toi à chaque ravito. La chaleur ne pardonne pas si tu pars trop vite.'},
+  ]},
+];
+
+// ---- State ----
+let state = JSON.parse(localStorage.getItem('sbh21k_v2')||'{"done":{},"checks":{}}');
+function save(){localStorage.setItem('sbh21k_v2',JSON.stringify(state));}
+
+// ---- Utils ----
+function toDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function todayStr(){const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;}
+function formatDayMonth(s){const d=toDate(s);const months=['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];return{n:d.getDate(),m:months[d.getMonth()]};}
+function dayName(s){const d=toDate(s);return['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()];}
+function intensityLabel(i){return i===1?'😌 Facile':i===2?'💪 Modéré':i===3?'🔥 Intense':'🏁 Course';}
+function intensityEmoji(i){return i===1?'🟢':i===2?'🟡':'🔴';}
+
+// ---- Get current workout ----
+function getCurrentWorkout(){
+  const ts=todayStr();
+  for(const w of plan) for(const d of w.days) if(d.d===ts) return{wk:w.wk,theme:w.theme,workout:d};
+  return null;
+}
+function getCurrentWeek(){
+  const ts=todayStr();
+  const today=toDate(ts);
+  for(const w of plan){
+    const dates=w.days.map(d=>toDate(d.d));
+    const wStart=new Date(Math.min(...dates));const wEnd=new Date(Math.max(...dates));
+    wEnd.setDate(wEnd.getDate()+1);
+    if(today>=wStart&&today<=wEnd) return w.wk;
+  }
+  if(today<toDate(plan[0].days[0].d)) return 1;
+  return 9;
+}
+
+// ---- Stats ----
+function getStats(){
+  let done=0,km=0,streak=0,prevDone=true;
+  const allWorkouts=plan.flatMap(w=>w.days).filter(d=>d.t==='run');
+  for(const w of allWorkouts){
+    if(state.done[w.d]){done++;km+=w.km;if(prevDone)streak++;} else{if(toDate(w.d)<new Date())prevDone=false;}
+  }
+  return{done,km:km.toFixed(0),streak};
+}
+function getTotalWorkouts(){return plan.flatMap(w=>w.days).filter(d=>d.t==='run').length;}
+
+// ---- Toggle done ----
+function toggleDone(date,isRace){
+  state.done[date]=!state.done[date];save();
+  renderAll();
+}
+function toggleCheck(id){
+  state.checks[id]=!state.checks[id];save();
+  renderChecks();
+}
+function renderChecks(){
+  for(let i=1;i<=8;i++){
+    const el=document.getElementById('c'+i);
+    if(!el) continue;
+    if(state.checks['c'+i]){el.style.textDecoration='line-through';el.style.color='var(--mu)';}
+    else{el.style.textDecoration='';el.style.color='';}
+  }
+}
+
+// ---- Render Dashboard ----
+function renderDashboard(){
+  // Countdown
+  const now=new Date();
+  const diff=Math.ceil((RACE_DATE-now)/(1000*60*60*24));
+  document.getElementById('countdown').textContent=diff>0?`J-${diff}`:'RACE DAY !';
+  // Progress
+  const stats=getStats();const total=getTotalWorkouts();
+  const pct=Math.round(stats.done/total*100);
+  document.getElementById('prg-fill').style.width=pct+'%';
+  document.getElementById('prg-pct').textContent=pct+'%';
+  document.getElementById('prg-label').textContent=`${stats.done}/${total} séances`;
+  // Stats
+  document.getElementById('pg-today').innerHTML=`
+    ${renderTodayCard()}
+    <div class="stats">
+      <div class="stat"><div class="sv">${stats.done}</div><div class="sl">Séances ✅</div></div>
+      <div class="stat"><div class="sv">${stats.km}</div><div class="sl">Km courus</div></div>
+      <div class="stat"><div class="sv">${diff>0?diff:0}</div><div class="sl">Jours restants</div></div>
+    </div>
+    ${renderWeekStrip()}
+  `;
+}
+
+function renderTodayCard(){
+  const ts=todayStr();const cur=getCurrentWorkout();
+  if(cur){
+    const w=cur.workout;const done=state.done[w.d];const isRace=w.t==='race';
+    return`<div class="tw ${w.t}">
+      <div class="wkbdg">Semaine ${cur.wk} — ${cur.theme}</div>
+      <div class="tw-ttl">${w.label}</div>
+      <div class="tw-sub">${dayName(w.d)}, ${formatDayMonth(w.d).n} ${getMonthName(w.d)} · ${intensityLabel(w.int)}</div>
+      <div class="meta-row">
+        <div class="mc">⏱️ ${w.dur}</div>
+        ${!isRace?`<div class="mc">📍 ~${w.km}km</div>`:''}
+        <div class="mc">${intensityEmoji(w.int)} ${w.int===1?'Facile':w.int===2?'Modéré':'Intense'}</div>
+      </div>
+      <div class="stps">${w.steps.map(s=>`<div class="stp"><div class="sdot"></div>${s}</div>`).join('')}</div>
+      <div class="tipbox"><strong>💡 Conseil du jour</strong>${w.tip}</div>
+      <button class="btn-done ${done?'done':isRace?'race':'idle'}" onclick="toggleDone('${w.d}')">
+        ${done?'✅ Séance complétée !':isRace?'🏁 Marquer comme terminé':'Marquer comme complété'}
+      </button>
+    </div>`;
+  }
+  // No run today — check if rest or tennis
+  const today=new Date();const dow=today.getDay();
+  const isTennis=dow>=1&&dow<=4;// Mon-Thu = likely tennis
+  if(isTennis) return`<div class="tw tennis"><div class="wkbdg">Semaine ${getCurrentWeek()}</div><div class="tw-ttl">🎾 Journée Tennis</div><div class="tw-sub">Cross-training — parfait pour le cardio</div><div class="tipbox"><strong>💡 Conseil</strong>Joue à intensité modérée. Le tennis développe ton cardio et ta coordination. Hydrate-toi bien !</div><div style="text-align:center;padding:10px 0;font-size:13px;opacity:.8;">Le prochain run est bientôt 👟</div></div>`;
+  return`<div class="tw rest"><div class="wkbdg">Semaine ${getCurrentWeek()}</div><div class="tw-ttl">😴 Journée Repos</div><div class="tw-sub">La récupération fait partie de l'entraînement</div><div class="tipbox"><strong>💡 Conseil</strong>Étirements doux, hydratation, sommeil. Ton corps se répare et s'améliore pendant les jours de repos.</div><div style="text-align:center;padding:10px 0;font-size:13px;opacity:.8;">Profite et récupère 🌴</div></div>`;
+}
+
+function getMonthName(s){const m=parseInt(s.split('-')[1]);return['jan','fév','mar','avr','mai','juin','juil','août'][m-1]||'';}
+
+function renderWeekStrip(){
+  const curWk=getCurrentWeek();const ts=todayStr();
+  const wData=plan[curWk-1];if(!wData)return'';
+  // Build 7-day window: Mon-Sun of current week
+  const today=new Date();const dow=today.getDay()===0?7:today.getDay();
+  const mon=new Date(today);mon.setDate(today.getDate()-(dow-1));
+  const days=[];for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);days.push(d);}
+  const runDates={};wData.days.forEach(d=>runDates[d.d]={type:d.t,done:state.done[d.d]});
+  const dNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const items=days.map((d,i)=>{
+    const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const rd=runDates[ds];const isToday=ds===ts;
+    let cls='rest',em='·';
+    if(rd){cls=rd.type==='race'?'race':'run';if(rd.done)cls+=' done';em=rd.type==='race'?'🏁':'🏃';}
+    else if(i<4){cls='tennis';em='🎾';}// Mon-Thu = tennis
+    return`<div class="wsd"><div class="wsl">${dNames[i]}</div><div class="wsdot ${cls}${isToday?' today-d':''}">${em}</div><div class="wsn">${d.getDate()}</div></div>`;
+  }).join('');
+  return`<div class="card"><div class="card-lbl">Cette semaine — S${curWk} : ${wData.theme}</div><div class="wstrip">${items}</div></div>`;
+}
+
+// ---- Render Programme ----
+function renderProgramme(){
+  const ts=todayStr();const curWk=getCurrentWeek();
+  let html='<div class="ttl">Programme 9 semaines</div>';
+  plan.forEach((w,wi)=>{
+    const runDays=w.days.filter(d=>d.t==='run');const doneCnt=runDays.filter(d=>state.done[d.d]).length;
+    const isPast=w.wk<curWk;const isCur=w.wk===curWk;const isFut=w.wk>curWk;
+    const numCls=isPast?'past':isCur?'cur':'fut';
+    const isOpen=isCur||wi===0&&curWk===1;
+    html+=`<div class="wblk">
+      <div class="whdr" onclick="toggleWeek(${wi})">
+        <div class="wnum ${numCls}">${w.wk}</div>
+        <div class="wmeta"><div class="wtheme">${w.theme}</div><div class="wdesc">${w.desc} · ${doneCnt}/${runDays.length} séances</div></div>
+        <span class="wchev${isOpen?' open':''}" id="wchev-${wi}">▼</span>
+      </div>
+      <div class="wbody" id="wbody-${wi}" style="${isOpen?'':'display:none'}">
+        ${w.days.map(d=>{
+          const dm=formatDayMonth(d.d);const isToday=d.d===ts;const done=state.done[d.d];
+          const icoClass=d.t==='race'?'ico-race':'ico-run';
+          const icoEm=d.t==='race'?'🏁':'🏃';
+          return`<div class="drow${isToday?' today-r':''}">
+            <div class="ddt"><div class="ddtn">${dm.n}</div><div class="ddtm">${dm.m}</div></div>
+            <div class="dico ${icoClass}">${icoEm}</div>
+            <div class="dinfo"><div class="dttl">${d.label}</div><div class="ddsc">${intensityLabel(d.int)} · ~${d.km}km</div></div>
+            <div class="dright"><div class="ddur">${d.dur}</div>
+            ${d.t!=='race'?`<div class="chk${done?' on':''}" onclick="toggleDone('${d.d}')">${done?'✓':''}</div>`:'<span style="font-size:16px">🏁</span>'}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+  document.getElementById('pg-prog').innerHTML=html;
+}
+
+function toggleWeek(i){
+  const body=document.getElementById('wbody-'+i);
+  const chev=document.getElementById('wchev-'+i);
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'';
+  chev.classList.toggle('open',!open);
+}
+
+// ---- Tips ----
+function showTip(id){
+  document.querySelectorAll('.tips').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.tp').forEach(el=>el.classList.remove('on'));
+  document.getElementById('tip-'+id).classList.add('on');
+  event.target.classList.add('on');
+}
+
+// ---- Navigation ----
+function showPage(name,btnId){
+  document.querySelectorAll('.pg').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));
+  document.getElementById('pg-'+name).classList.add('on');
+  document.getElementById(btnId).classList.add('on');
+  if(name==='prog') renderProgramme();
+  if(name==='race') renderChecks();
+}
+
+// ---- Render All ----
+function renderAll(){renderDashboard();const active=document.querySelector('.pg.on');if(active&&active.id==='pg-prog')renderProgramme();}
+
+// ---- Init ----
+renderAll();renderChecks();
+</script>
+</body>
+</html>
