@@ -231,6 +231,7 @@ tr:last-child td{border-bottom:none;}
       <div class="ml-item"><div class="ml-dot" style="background:#f97316"></div>Points clés</div>
     </div>
     <p style="font-size:12px;color:var(--mu);line-height:1.5;">Départ 5h30 · Parking Collectivité → Lorient → Grande Saline → St-Jean → Gustavia · Arrivée Parvis Wall House</p>
+    <p id="map-dist" style="font-size:11px;color:var(--t);font-weight:700;margin-top:4px;"></p>
   </div>
   <div class="irow">
     <div class="ic"><div class="iv">21.1km</div><div class="il">Distance</div></div>
@@ -542,151 +543,97 @@ function initMap(){
   mapInitialized = true;
 
   const map = L.map('race-map', {zoomControl:true, scrollWheelZoom:false, attributionControl:false});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:16}).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:17}).addTo(map);
 
-  // Tracé GPS précis SBH 21K — routes terrestres uniquement
-  // Basé sur l'image officielle + connaissance des routes de St-Barth
-  //
-  // SEGMENT 1 : Gustavia → montée vers Lorient (route principale D209 est)
-  // SEGMENT 2 : Boucle Lorient (anse + pointe)
-  // SEGMENT 3 : Lorient → Petite Saline → Camaruche (route D209 sud-est)
-  // SEGMENT 4 : Demi-tour Camaruche → retour via Coupe Gorge → St-Jean
-  // SEGMENT 5 : St-Jean (plage, stade, bout piste) boucle
-  // SEGMENT 6 : Retour Eden Rock → La Tourmente → montée Public
-  // SEGMENT 7 : Public → Gustavia → Rue du Bord de Mer → Wall House
-  const route = [
-    // === DÉPART : Parking Collectivité, Gustavia ===
-    [17.8963, -62.8514],
-    [17.8970, -62.8502], // Rue Victor Schoelcher, remontée nord
-    [17.8980, -62.8488],
-    [17.8992, -62.8470], // Quitte Gustavia vers la D209 direction est
-    [17.9002, -62.8452],
-    [17.9012, -62.8435], // Route principale montée vers col
-    [17.9025, -62.8415],
-    [17.9038, -62.8395], // Col — vue sur Lorient
-    [17.9050, -62.8372],
-    [17.9058, -62.8348], // Descente vers Lorient
-    [17.9065, -62.8322],
-    [17.9068, -62.8302], // Entrée Lorient (pt 13)
-
-    // === BOUCLE LORIENT : pointe est puis retour ===
-    [17.9072, -62.8282],
-    [17.9068, -62.8262], // Pointe est de la boucle Lorient
-    [17.9058, -62.8272],
-    [17.9050, -62.8288], // Retour Lorient centre
-    [17.9062, -62.8302], // Cimetière de Lorient (stop)
-    [17.9055, -62.8318],
-
-    // === LORIENT → LES ARTISTES → PETITE SALINE ===
-    [17.9040, -62.8332], // Les Artistes (pt 12)
-    [17.9022, -62.8348],
-    [17.9005, -62.8362], // Route D209 descend vers Saline
-    [17.8988, -62.8368],
-    [17.8968, -62.8372], // Petite Saline (pt 8)
-    [17.8950, -62.8368],
-
-    // === PETITE SALINE → GRANDE SALINE → CAMARUCHE ===
-    [17.8932, -62.8358],
-    [17.8915, -62.8342], // Route vers Grande Saline
-    [17.8898, -62.8328],
-    [17.8880, -62.8318], // Grande Saline (pt 9)
-    [17.8862, -62.8312],
-    [17.8848, -62.8305], // Approche bas Camaruche
-    [17.8838, -62.8298], // Demi-tour parking Saline (pt 10)
-
-    // === REMONTÉE CAMARUCHE → COUPE GORGE ===
-    [17.8848, -62.8308],
-    [17.8860, -62.8318],
-    [17.8872, -62.8328],
-    [17.8885, -62.8332], // Remontée Camaruche (pt 11)
-    [17.8900, -62.8335],
-    [17.8915, -62.8342], // Coupe Gorge / route centrale
-
-    // === RETOUR VERS ST-JEAN VIA D209 CENTRALE ===
-    [17.8928, -62.8348],
-    [17.8940, -62.8358],
-    [17.8950, -62.8368],
-    [17.8960, -62.8378], // Rond-point Villa Créole (pt 15)
-    [17.8968, -62.8392],
-    [17.8975, -62.8408],
-    [17.8982, -62.8422], // Rond-point Eden Rock (pt 16)
-
-    // === BOUCLE ST-JEAN : plage + stade + bout piste ===
-    [17.8990, -62.8432],
-    [17.8998, -62.8445], // Route vers plage St-Jean
-    [17.9005, -62.8455],
-    [17.9010, -62.8468], // Traversée plage St-Jean
-    [17.9014, -62.8480],
-    [17.9016, -62.8492], // Stade Municipal St-Jean
-    [17.9014, -62.8505],
-    [17.9010, -62.8515], // Bout de la piste aéroport (demi-tour)
-    [17.9005, -62.8508],
-    [17.8998, -62.8498],
-    [17.8990, -62.8488], // Retour Eden Rock (pt 17-18)
-    [17.8982, -62.8475],
-    [17.8975, -62.8462], // Rond-point Eden Rock retour
-
-    // === EDEN ROCK → LA TOURMENTE ===
-    [17.8968, -62.8472],
-    [17.8960, -62.8482],
-    [17.8952, -62.8492], // Route vers La Tourmente
-    [17.8944, -62.8502],
-    [17.8938, -62.8512], // La Tourmente
-
-    // === MONTÉE PUBLIC → GUSTAVIA ===
-    [17.8932, -62.8522],
-    [17.8928, -62.8535],
-    [17.8932, -62.8548], // Col Public
-    [17.8938, -62.8558],
-    [17.8945, -62.8565], // Quartier Public
-    [17.8952, -62.8572],
-    [17.8958, -62.8578], // Traversée Public
-
-    // === GUSTAVIA : Rue de la République → Bord de Mer ===
-    [17.8962, -62.8570],
-    [17.8963, -62.8558], // Rue de la République
-    [17.8963, -62.8545],
-    [17.8962, -62.8535],
-    [17.8960, -62.8526], // Rue du Bord de Mer longe le port
-    [17.8958, -62.8522],
-
-    // === ARRIVÉE : Parvis Wall House ===
-    [17.8964, -62.8522], // Wall House
+  // Points de passage clés du parcours (lon,lat pour OSRM)
+  // Lus depuis l'image officielle :
+  // Départ Parking Collectivité → Rue Victor Schoelcher → montée D209 → Lorient
+  // → boucle Lorient → Cimetière → Les Artistes → Petite Saline
+  // → Grande Saline → demi-tour Camaruche → Coupe Gorge → Villa Créole
+  // → Eden Rock → plage St-Jean → stade → bout piste → retour Eden Rock
+  // → La Tourmente → montée Public → Gustavia → Rue du Bord de Mer → Wall House
+  const waypoints = [
+    [-62.8514, 17.8963], // 0. Départ — Parking Collectivité Gustavia
+    [-62.8455, 17.9000], // 1. Montée D209 sortie Gustavia
+    [-62.8308, 17.9068], // 2. Lorient — boucle pointe est
+    [-62.8278, 17.9065], // 3. Pointe Lorient
+    [-62.8310, 17.9060], // 4. Cimetière Lorient
+    [-62.8340, 17.9038], // 5. Les Artistes (pt 12)
+    [-62.8372, 17.8968], // 6. Petite Saline (pt 8)
+    [-62.8322, 17.8848], // 7. Grande Saline (pt 9)
+    [-62.8298, 17.8832], // 8. Demi-tour Camaruche (pt 10)
+    [-62.8332, 17.8888], // 9. Coupe Gorge (pt 11)
+    [-62.8385, 17.8962], // 10. Villa Créole (pt 15)
+    [-62.8428, 17.8982], // 11. Eden Rock (pt 16)
+    [-62.8482, 17.9014], // 12. Stade St-Jean
+    [-62.8518, 17.9012], // 13. Bout piste aéroport (demi-tour)
+    [-62.8478, 17.8985], // 14. Retour Eden Rock (pt 17-18)
+    [-62.8510, 17.8942], // 15. La Tourmente
+    [-62.8558, 17.8932], // 16. Montée Public
+    [-62.8572, 17.8958], // 17. Public / Gustavia
+    [-62.8520, 17.8964], // 18. Arrivée — Wall House
   ];
 
-  // Tracé principal bleu
-  L.polyline(route, {color:'#0d9488', weight:4, opacity:0.85, lineJoin:'round'}).addTo(map);
-
-  // Marker départ (vert)
-  const iconDepart = L.divIcon({
-    html:`<div style="background:#16a34a;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);">🏁</div>`,
-    className:'',iconSize:[28,28],iconAnchor:[14,14]
-  });
-  L.marker(route[0], {icon:iconDepart}).addTo(map).bindPopup('<b>Départ 5h30</b><br>Parking Collectivité<br>Gustavia');
-
-  // Marker arrivée (rouge)
-  const iconArrivee = L.divIcon({
-    html:`<div style="background:#dc2626;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);">🎉</div>`,
-    className:'',iconSize:[28,28],iconAnchor:[14,14]
-  });
-  L.marker(route[route.length-1], {icon:iconArrivee}).addTo(map).bindPopup('<b>Arrivée !</b><br>Parvis du Wall House<br>Gustavia');
+  // Afficher les marqueurs départ/arrivée immédiatement
+  const iconDepart = L.divIcon({html:`<div style="background:#16a34a;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);">🏁</div>`,className:'',iconSize:[28,28],iconAnchor:[14,14]});
+  const iconArrivee = L.divIcon({html:`<div style="background:#dc2626;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);">🎉</div>`,className:'',iconSize:[28,28],iconAnchor:[14,14]});
+  L.marker([waypoints[0][1], waypoints[0][0]],{icon:iconDepart}).addTo(map).bindPopup('<b>Départ 5h30</b><br>Parking Collectivité, Gustavia');
+  L.marker([waypoints[waypoints.length-1][1], waypoints[waypoints.length-1][0]],{icon:iconArrivee}).addTo(map).bindPopup('<b>Arrivée !</b><br>Parvis du Wall House');
 
   // Points kilométriques clés
   const kmPoints = [
-    {pos:[17.9068,-62.8302], km:'~5', label:'Lorient'},
-    {pos:[17.8838,-62.8298], km:'~10', label:'Grande Saline'},
-    {pos:[17.8982,-62.8422], km:'~15', label:'Eden Rock'},
-    {pos:[17.8938,-62.8512], km:'~18', label:'La Tourmente'},
+    {wp:2, km:'~5km', label:'Lorient'},
+    {wp:8, km:'~10km', label:'Demi-tour Saline'},
+    {wp:11, km:'~15km', label:'Eden Rock'},
+    {wp:15, km:'~18km', label:'La Tourmente'},
   ];
   kmPoints.forEach(p=>{
-    const ico = L.divIcon({
-      html:`<div style="background:#f97316;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);">${p.km}</div>`,
-      className:'',iconSize:[22,22],iconAnchor:[11,11]
-    });
-    L.marker(p.pos,{icon:ico}).addTo(map).bindPopup(`<b>Km ${p.km}</b><br>${p.label}`);
+    const ico = L.divIcon({html:`<div style="background:#f97316;color:#fff;border-radius:20px;padding:2px 6px;font-size:10px;font-weight:800;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);white-space:nowrap;">${p.km}</div>`,className:'',iconAnchor:[20,10]});
+    L.marker([waypoints[p.wp][1], waypoints[p.wp][0]],{icon:ico}).addTo(map).bindPopup(`<b>${p.km}</b> — ${p.label}`);
   });
 
-  map.fitBounds(L.polyline(route).getBounds(), {padding:[20,20]});
+  // Centrer la carte sur St-Barth en attendant le tracé
+  map.setView([17.896, -62.840], 13);
+
+  // Appel OSRM par segments (max 10 waypoints par appel)
+  async function fetchSegment(pts){
+    const coords = pts.map(p=>p.join(',')).join(';');
+    const url = `https://router.project-osrm.org/route/v1/foot/${coords}?overview=full&geometries=geojson`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if(d.routes && d.routes[0]) return d.routes[0].geometry.coordinates;
+    return pts.map(p=>[p[0],p[1]]);
+  }
+
+  // Découper en 2 segments de ~10 points
+  const seg1 = waypoints.slice(0, 10);
+  const seg2 = waypoints.slice(9); // overlap d'un point pour continuité
+
+  Promise.all([fetchSegment(seg1), fetchSegment(seg2)]).then(([coords1, coords2])=>{
+    const allCoords = [...coords1, ...coords2];
+    // OSRM retourne [lon, lat], Leaflet attend [lat, lon]
+    const latlngs = allCoords.map(c=>[c[1],c[0]]);
+    const polyline = L.polyline(latlngs, {color:'#0d9488', weight:5, opacity:0.9, lineJoin:'round'}).addTo(map);
+
+    // Calculer distance totale
+    let totalKm = 0;
+    for(let i=1;i<latlngs.length;i++){
+      const R=6371;
+      const dLat=(latlngs[i][0]-latlngs[i-1][0])*Math.PI/180;
+      const dLon=(latlngs[i][1]-latlngs[i-1][1])*Math.PI/180;
+      const a=Math.sin(dLat/2)**2+Math.cos(latlngs[i-1][0]*Math.PI/180)*Math.cos(latlngs[i][0]*Math.PI/180)*Math.sin(dLon/2)**2;
+      totalKm+=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    }
+    const distEl = document.getElementById('map-dist');
+    if(distEl) distEl.textContent = `Tracé calculé : ${totalKm.toFixed(1)} km`;
+
+    map.fitBounds(polyline.getBounds(), {padding:[20,20]});
+  }).catch(()=>{
+    // Fallback si OSRM indisponible : tracé direct entre waypoints
+    const latlngs = waypoints.map(p=>[p[1],p[0]]);
+    L.polyline(latlngs,{color:'#0d9488',weight:4,opacity:0.8,dashArray:'8,4'}).addTo(map);
+    map.fitBounds(L.polyline(latlngs).getBounds(),{padding:[20,20]});
+  });
 }
 
 // Init carte quand on clique sur l'onglet Course
